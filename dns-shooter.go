@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/zhangmingkai4315/dns-shooter/dns"
+	"github.com/zhangmingkai4315/go-dns-shooter/dns"
 )
 
 var (
