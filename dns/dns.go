@@ -189,17 +189,18 @@ func (dns *DNSPacket) UpdateSubDomainToBytes(domain string) (msg []byte, err err
 	// Get a new ID for packet
 	id := GenerateRandomID(true)
 	packUint16(id, dns.RawByte, 0)
-	if len(dns.RawByte) > 0 && dns.init == true {
+	rawByte := dns.RawByte[:]
+	if len(rawByte) > 0 && dns.init == true {
 		formatName := PackDomainName(FqdnFormat(domain))
 		for i, v := range formatName {
-			dns.RawByte[12+i] = v
+			rawByte[12+i] = v
 		}
 		if dns.RandomType {
 			offset := 12 + len(formatName)
-			packUint16(GenRandomType(), dns.RawByte, offset)
+			packUint16(GenRandomType(), rawByte, offset)
 			// dns.RawByte[] = GenRandomType()
 		}
-		return dns.RawByte, nil
+		return rawByte, nil
 	}
 	return nil, errors.New("Please call ToBytes() before generate more packet")
 }
@@ -293,13 +294,11 @@ func (dns *DNSPacket) GeneratePacket(server string, total int, timeout int, qps 
 						<-throttle
 					}
 					randomDomain := GenRandomDomain(length, domain)
-
-					dns.lock.Lock()
-					if _, err := dns.UpdateSubDomainToBytes(randomDomain); err != nil {
+					rawByte, err := dns.UpdateSubDomainToBytes(randomDomain)
+					if err != nil {
 						log.Panicf("%v", err)
 					}
-					conn.Write(dns.RawByte)
-					dns.lock.Unlock()
+					conn.Write(rawByte)
 					atomic.AddUint32(&counter, 1)
 					if jumpOut == true {
 						break
