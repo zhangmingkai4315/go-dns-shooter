@@ -34,6 +34,9 @@ func GenRandomType() uint16 {
 // Argument : length is the length of sub domain name, domain is the tld name
 // Return : random domain name
 func GenRandomDomain(length int, domain string) string {
+	if length == 0 {
+		return domain
+	}
 	b := make([]byte, length)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
