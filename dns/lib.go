@@ -41,6 +41,9 @@ func GenRandomDomain(length int, domain string) string {
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
+	if domain == "." {
+		return string(b)
+	}
 	return string(b) + "." + domain
 }
 
